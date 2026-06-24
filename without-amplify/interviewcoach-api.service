@@ -1,0 +1,39 @@
+# /etc/systemd/system/interviewcoach-api.service
+# Solution SANS Amplify — API .NET 10
+#
+# Installation :
+#   sudo cp interviewcoach-api.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now interviewcoach-api
+#
+# Logs : sudo journalctl -u interviewcoach-api -f
+
+[Unit]
+Description=InterviewCoach .NET 10 API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=interviewcoach-api
+Group=interviewcoach-api
+WorkingDirectory=/opt/interviewcoach/api
+ExecStart=/usr/bin/dotnet /opt/interviewcoach/api/InterviewCoach.Api.dll
+Restart=always
+RestartSec=10
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+EnvironmentFile=/etc/interviewcoach/api.env
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/interviewcoach/api/logs
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=interviewcoach-api
+
+[Install]
+WantedBy=multi-user.target

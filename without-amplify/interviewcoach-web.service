@@ -1,0 +1,42 @@
+# /etc/systemd/system/interviewcoach-web.service
+# Solution SANS Amplify — Frontend Next.js standalone
+#
+# Prérequis : next.config.ts doit avoir output: "standalone"
+# Le build produit .next/standalone/server.js
+#
+# Installation :
+#   sudo cp interviewcoach-web.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now interviewcoach-web
+#
+# Logs : sudo journalctl -u interviewcoach-web -f
+
+[Unit]
+Description=InterviewCoach Next.js Frontend
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=interviewcoach-web
+Group=interviewcoach-web
+WorkingDirectory=/opt/interviewcoach/web
+ExecStart=/usr/bin/node /opt/interviewcoach/web/server.js
+Restart=always
+RestartSec=10
+KillSignal=SIGTERM
+TimeoutStopSec=30
+
+EnvironmentFile=/etc/interviewcoach/web.env
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/interviewcoach/web/logs
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=interviewcoach-web
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,35 @@
+# amplify.yml — Configuration de build pour AWS Amplify
+# Solution AVEC Amplify — à placer à la racine du dépôt Git
+#
+# Ce fichier indique à Amplify comment builder le frontend Next.js.
+# Amplify détecte automatiquement le framework Next.js SSR grâce à next.config.ts.
+#
+# Variables d'environnement à configurer dans la console Amplify AVANT le build :
+#   NEXT_PUBLIC_API_URL = https://XXXXXXXXXXXXX.cloudfront.net
+#
+# IMPORTANT : NEXT_PUBLIC_API_URL est inlinée dans le bundle JS au moment du build.
+# Si l'URL CloudFront change, il faut forcer un nouveau build dans Amplify.
+
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - cd src/web
+        - node --version
+        - npm --version
+        - npm ci
+    build:
+      commands:
+        - cd src/web
+        - npm run build
+  artifacts:
+    # next.config.ts utilise output: "standalone"
+    # Amplify prend le dossier .next complet pour le mode SSR (Web Compute)
+    baseDirectory: src/web/.next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - src/web/node_modules/**/*
+      - src/web/.next/cache/**/*
